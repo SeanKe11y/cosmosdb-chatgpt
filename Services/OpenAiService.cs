@@ -44,7 +44,12 @@ public class OpenAiService
 
         _modelName = modelName;
 
-        _client = new(new Uri(endpoint), new AzureKeyCredential(key));
+        Uri uri = new(endpoint);
+        AzureKeyCredential credential = new(key);
+        _client = new(
+            endpoint: uri,
+            keyCredential: credential
+        );
     }
 
     /// <summary>
@@ -61,7 +66,7 @@ public class OpenAiService
 
         ChatCompletionsOptions options = new()
         {
-
+            DeploymentName = _modelName,
             Messages =
             {
                 systemMessage,
@@ -75,7 +80,9 @@ public class OpenAiService
             PresencePenalty = 0
         };
 
-        Response<ChatCompletions> completionsResponse = await _client.GetChatCompletionsAsync(_modelName, options);
+        CancellationToken token = default;
+
+        Response<ChatCompletions> completionsResponse = await _client.GetChatCompletionsAsync(options, token);
 
         ChatCompletions completions = completionsResponse.Value;
 
@@ -99,6 +106,7 @@ public class OpenAiService
 
         ChatCompletionsOptions options = new()
         {
+            DeploymentName = _modelName,
             Messages = {
                 systemMessage,
                 userMessage
@@ -110,8 +118,9 @@ public class OpenAiService
             FrequencyPenalty = 0,
             PresencePenalty = 0
         };
+        CancellationToken token = default;
 
-        Response<ChatCompletions> completionsResponse = await _client.GetChatCompletionsAsync(_modelName, options);
+        Response<ChatCompletions> completionsResponse = await _client.GetChatCompletionsAsync(options, token);
 
         ChatCompletions completions = completionsResponse.Value;
 
